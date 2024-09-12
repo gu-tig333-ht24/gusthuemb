@@ -4,6 +4,13 @@ void main() {
   runApp(MyApp());
 }
 
+class Todo{
+  String todo;
+
+  Todo(this.todo);
+}
+
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -22,41 +29,44 @@ class MyApp extends StatelessWidget {
         ),
         body: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                IconButton(onPressed: () {}, icon: Icon(Icons.square_outlined)),
-                Expanded( child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Read a book', style: TextStyle(fontSize: 30),),
-                  ],
-                ),
-                ),
-                IconButton(onPressed: () {print('remove');}, icon: Icon(Icons.clear_outlined)),]
-            ),
+            _item('Read a book'),
             Divider(color: Colors.grey,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                IconButton(onPressed: () {}, icon: Icon(Icons.square_outlined)),
-                Expanded( child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Read a book', style: TextStyle(fontSize: 30),),
-                  ],
-                ),
-                ),
-                IconButton(onPressed: () {}, icon: Icon(Icons.clear_outlined)),]
-            ),
+            _item('Cook dinner'),
+            Divider(color: Colors.grey,),
+            _item('Do the dishes'),
+            Divider(color: Colors.grey,),
+            _item('Vacuum'),
+            Divider(color: Colors.grey,),
+            _item('Continue working on the to do app'),
+            Divider(color: Colors.grey,),
+            _item('Continue knitting'),
+            Divider(color: Colors.grey,),
+            _item('Buy a present'),
+            Divider(color: Colors.grey,),
           ],
         ), 
         
     )
     );
+  
+  
 }
+  Widget _item(String todo) {
+    return Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                IconButton(onPressed: () {}, icon: Icon(Icons.square_outlined)),
+                Expanded( child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(todo, style: TextStyle(fontSize: 30),),
+                  ],
+                ),
+                ),
+                IconButton(onPressed: () {}, icon: Icon(Icons.clear_outlined)),]
+            ); 
+            
+  }
 }
