@@ -1,32 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+class MyState extends ChangeNotifier {
+  List<Todo> _todos = [
+    Todo('Learn Flutter', false),
+    Todo('Read a book', true),
+    Todo('Cook dinner', false),
+    Todo('Do the dishes', false),
+  ];
+
+  List<Todo> get todos => _todos;
+
+  void addTodo(String title, bool checked) {
+    todos.add(Todo(title, checked));
+    notifyListeners();
+  }
+
+  void checkTask(Todo todo) {
+    todo.ischecked = !todo.ischecked;
+    notifyListeners();
+  }
+
+  void removeTask(Todo todo) {
+    todos.remove(todo);
+    notifyListeners();
+  }
+
+}
 
 void main() {
-  runApp(MaterialApp(
-    title: 'Todo app',
-    home: MyApp(),
-  ));
+  MyState state = MyState();
+  runApp(
+    ChangeNotifierProvider(
+        create: (context) => state,
+        child: MaterialApp(
+          title: 'Todo app',
+          home: MyApp(),
+        )),
+  );
 }
+
 
 class Todo {
-  String todo;
+  String task;
+  bool ischecked;
 
-  Todo(this.todo);
+  Todo(this.task, this.ischecked);
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of the application.
   @override
   Widget build(BuildContext context) {
-    List<Todo> todos = [
-      Todo('Learn Flutter'),
-      Todo('Read a book'),
-      Todo('Grocery shopping'),
-      Todo('Cook dinner'),
-      Todo('Do the dishes'),
-      Todo('Vacuum the floors'),
-    ];
+
+    var todos = context.watch<MyState>().todos;
 
     return MaterialApp(
       title: 'Flutter Demo',
@@ -37,7 +66,7 @@ class MyApp extends StatelessWidget {
           actions: [IconButton(onPressed: () {}, icon: Icon(Icons.more_vert))],
         ),
         body:
-            ListView(children: todos.map((todo) => _item(todo.todo)).toList()),
+            ListView(children: todos.map((todo) => _item(todo, context)).toList()),
         floatingActionButton: IconButton(
           onPressed: () {
             Navigator.push(
@@ -50,7 +79,7 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  Widget _item(String todo) {
+  Widget _item(Todo todo, BuildContext context) {
     return Column(
       children: [
         Padding(padding: EdgeInsets.all(10)),
@@ -58,20 +87,20 @@ class MyApp extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              IconButton(onPressed: () {}, icon: Icon(Icons.square_outlined)),
+              IconButton(onPressed: () {context.read<MyState>().checkTask(todo);}, icon: Icon(todo.ischecked?Icons.check_box_outlined:Icons.check_box_outline_blank_outlined)),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      todo,
-                      style: TextStyle(fontSize: 28),
+                      todo.task,
+                      style: TextStyle(fontSize: 28, decoration: todo.ischecked?TextDecoration.lineThrough:TextDecoration.none),
                     ),
                   ],
                 ),
               ),
-              IconButton(onPressed: () {}, icon: Icon(Icons.clear_outlined)),
+              IconButton(onPressed: () {context.read<MyState>().removeTask(todo);}, icon: Icon(Icons.clear_outlined)),
             ]),
         Padding(padding: EdgeInsets.all(5)),
         Divider(
@@ -82,7 +111,24 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class OtherView extends StatelessWidget {
+class OtherView extends StatefulWidget {
+  @override
+  State<OtherView> createState() => _OtherViewState();
+}
+
+class _OtherViewState extends State<OtherView> {
+  TextEditingController? textEditingController;
+
+  _OtherViewState() {
+    textEditingController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    textEditingController!.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,6 +149,7 @@ class OtherView extends StatelessWidget {
                 decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'What are you going to do?'),
+                controller: textEditingController,
               ),
             ),
           ),
@@ -110,7 +157,11 @@ class OtherView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                context.read<MyState>().addTodo(textEditingController!.text, false);
+      
+
+                },
                 icon: Icon(Icons.add),
                 label: Text('ADD'),
               ),
