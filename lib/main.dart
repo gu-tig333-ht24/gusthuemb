@@ -4,15 +4,21 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 var url = Uri.https('todoapp-api.apps.k8s.gu.se', '/todos',
-    {'key': ''});
+    {'key': '74242629-8342-4db7-b446-5f9163e6541b'});
 
 class MyState extends ChangeNotifier {
   List<Todo> _todos = [];
 
   List<Todo> get todos => _todos;
 
-  void addTodo(String id, String title, bool checked) {
-    todos.add(Todo(id, title, checked));
+
+  void addTodo(String title, bool checked) async {
+    Todo todo = (Todo(title, checked));
+    await http.post(url,
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: jsonEncode(todo.toJson()));
     notifyListeners();
   }
 
@@ -31,6 +37,7 @@ class MyState extends ChangeNotifier {
     _todos = todos;
     notifyListeners();
   }
+
 }
 
 void main() {
@@ -50,16 +57,24 @@ void main() {
 }
 
 class Todo {
-  String id;
+  String? id;
   String task;
   bool ischecked;
 
-  Todo(this.id, this.task, this.ischecked);
+  Todo(this.task, this.ischecked, [this.id]);
 
   factory Todo.fromJson(Map<String, dynamic> json) {
-    return Todo(json['id'], json['title'], json['done']);
+    return Todo(json['title'], json['done'], json['id']);
+  }
+  Map<String, dynamic> toJson () {
+    return {
+      "title": task,
+      "done": ischecked,
+    };
   }
 }
+
+
 //hämta alla todos från backend api
 Future<List<Todo>> getTodos() async {
   http.Response response = await http.get(url);
@@ -193,7 +208,8 @@ class _OtherViewState extends State<OtherView> {
                 onPressed: () {
                   context
                       .read<MyState>()
-                      .addTodo('', textEditingController!.text, false);
+                      .addTodo(textEditingController!.text, false);
+                  context.read<MyState>().fetchTodos();
                 },
                 icon: Icon(Icons.add),
                 label: Text('ADD'),
