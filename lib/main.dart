@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+var url = Uri.https('todoapp-api.apps.k8s.gu.se', '/todos',
+    {'key': ''});
 
 class MyState extends ChangeNotifier {
-  List<Todo> _todos = [
-    Todo('Learn Flutter', false),
-    Todo('Read a book', true),
-    Todo('Cook dinner', false),
-    Todo('Do the dishes', false),
-  ];
+  List<Todo> _todos = [];
 
   List<Todo> get todos => _todos;
 
-  void addTodo(String title, bool checked) {
-    todos.add(Todo(title, checked));
+  void addTodo(String id, String title, bool checked) {
+    todos.add(Todo(id, title, checked));
     notifyListeners();
   }
 
@@ -26,10 +26,19 @@ class MyState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void fetchTodos() async {
+    var todos = await getTodos();
+    _todos = todos;
+    notifyListeners();
+  }
 }
 
 void main() {
   MyState state = MyState();
+
+  // hämta listan av todos
+  state.fetchTodos();
+
   runApp(
     ChangeNotifierProvider(
         create: (context) => state,
@@ -40,14 +49,24 @@ void main() {
   );
 }
 
-
 class Todo {
+  String id;
   String task;
   bool ischecked;
 
-  Todo(this.task, this.ischecked);
-}
+  Todo(this.id, this.task, this.ischecked);
 
+  factory Todo.fromJson(Map<String, dynamic> json) {
+    return Todo(json['id'], json['title'], json['done']);
+  }
+}
+//hämta alla todos från backend api
+Future<List<Todo>> getTodos() async {
+  http.Response response = await http.get(url);
+  String body = response.body;
+  final List<dynamic> todoList = jsonDecode(body);
+  return todoList.map((json) => Todo.fromJson(json)).toList();
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -65,8 +84,8 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.grey,
           actions: [IconButton(onPressed: () {}, icon: Icon(Icons.more_vert))],
         ),
-        body:
-            ListView(children: todos.map((todo) => _item(todo, context)).toList()),
+        body: ListView(
+            children: todos.map((todo) => _item(todo, context)).toList()),
         floatingActionButton: IconButton(
           onPressed: () {
             Navigator.push(
@@ -87,7 +106,13 @@ class MyApp extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              IconButton(onPressed: () {context.read<MyState>().checkTask(todo);}, icon: Icon(todo.ischecked?Icons.check_box_outlined:Icons.check_box_outline_blank_outlined)),
+              IconButton(
+                  onPressed: () {
+                    context.read<MyState>().checkTask(todo);
+                  },
+                  icon: Icon(todo.ischecked
+                      ? Icons.check_box_outlined
+                      : Icons.check_box_outline_blank_outlined)),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -95,12 +120,20 @@ class MyApp extends StatelessWidget {
                   children: [
                     Text(
                       todo.task,
-                      style: TextStyle(fontSize: 28, decoration: todo.ischecked?TextDecoration.lineThrough:TextDecoration.none),
+                      style: TextStyle(
+                          fontSize: 28,
+                          decoration: todo.ischecked
+                              ? TextDecoration.lineThrough
+                              : TextDecoration.none),
                     ),
                   ],
                 ),
               ),
-              IconButton(onPressed: () {context.read<MyState>().removeTask(todo);}, icon: Icon(Icons.clear_outlined)),
+              IconButton(
+                  onPressed: () {
+                    context.read<MyState>().removeTask(todo);
+                  },
+                  icon: Icon(Icons.clear_outlined)),
             ]),
         Padding(padding: EdgeInsets.all(5)),
         Divider(
@@ -158,9 +191,9 @@ class _OtherViewState extends State<OtherView> {
             children: [
               TextButton.icon(
                 onPressed: () {
-                context.read<MyState>().addTodo(textEditingController!.text, false);
-      
-
+                  context
+                      .read<MyState>()
+                      .addTodo('', textEditingController!.text, false);
                 },
                 icon: Icon(Icons.add),
                 label: Text('ADD'),
