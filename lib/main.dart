@@ -3,33 +3,61 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+/*
 var url = Uri.https('todoapp-api.apps.k8s.gu.se', '/todos',
     {'key': '74242629-8342-4db7-b446-5f9163e6541b'});
+*/
+
+String ENDPOINT = 'https://todoapp-api.apps.k8s.gu.se';
+String KEY = '74242629-8342-4db7-b446-5f9163e6541b';
+
+enum FilterValue { all, done, undone }
 
 class MyState extends ChangeNotifier {
   List<Todo> _todos = [];
 
   List<Todo> get todos => _todos;
 
+  FilterValue _selectedFilter = FilterValue.all;
 
-  void addTodo(String title, bool checked) async {
+  FilterValue get selectedFilter => _selectedFilter;
+
+  Future<void> addTodo(String title, bool checked) async {
     Todo todo = (Todo(title, checked));
+    print(todo);
+    await http.post(Uri.parse('$ENDPOINT/todos?key=$KEY'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(todo.toJson()));
+    /*
     await http.post(url,
     headers: {
       "Content-Type": "application/json"
     },
     body: jsonEncode(todo.toJson()));
-    notifyListeners();
+    */
+    fetchTodos();
   }
 
-  void checkTask(Todo todo) {
-    todo.ischecked = !todo.ischecked;
-    notifyListeners();
+  void checkTask(Todo todo) async {
+    await http.put(Uri.parse('$ENDPOINT/todos/${todo.id}?key=$KEY'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(
+            {'title': todo.task, 'done': todo.ischecked = !todo.ischecked}));
+    fetchTodos();
   }
 
-  void removeTask(Todo todo) {
-    todos.remove(todo);
-    notifyListeners();
+  void removeTask(Todo todo) async {
+    await http.delete(Uri.parse('$ENDPOINT/todos/${todo.id}?key=$KEY'));
+    fetchTodos();
+  }
+
+  //hämta alla todos från backend api
+  Future<List<Todo>> getTodos() async {
+    http.Response response =
+        await http.get(Uri.parse('$ENDPOINT/todos?key=$KEY'));
+    String body = response.body;
+    final List<dynamic> todoList = jsonDecode(body);
+    return todoList.map((json) => Todo.fromJson(json)).toList();
   }
 
   void fetchTodos() async {
@@ -38,6 +66,10 @@ class MyState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setSelectedFilter(FilterValue selectedFilter) {
+    _selectedFilter = selectedFilter;
+    print(_selectedFilter);
+  }
 }
 
 void main() {
@@ -66,7 +98,7 @@ class Todo {
   factory Todo.fromJson(Map<String, dynamic> json) {
     return Todo(json['title'], json['done'], json['id']);
   }
-  Map<String, dynamic> toJson () {
+  Map<String, dynamic> toJson() {
     return {
       "title": task,
       "done": ischecked,
@@ -74,33 +106,41 @@ class Todo {
   }
 }
 
-
-//hämta alla todos från backend api
-Future<List<Todo>> getTodos() async {
-  http.Response response = await http.get(url);
-  String body = response.body;
-  final List<dynamic> todoList = jsonDecode(body);
-  return todoList.map((json) => Todo.fromJson(json)).toList();
-}
-
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-
     var todos = context.watch<MyState>().todos;
 
     return MaterialApp(
       title: 'Flutter Demo',
       home: Scaffold(
         appBar: AppBar(
-          title: Text('TIG333 TODO'),
-          backgroundColor: Colors.grey,
-          actions: [IconButton(onPressed: () {}, icon: Icon(Icons.more_vert))],
-        ),
+            title: Text('TIG333 TODO'),
+            backgroundColor: Colors.grey,
+            actions: [
+              PopupMenuButton(
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                      value: FilterValue.all,
+                      child: Text(FilterValue.all.name)),
+                  PopupMenuItem(
+                      value: FilterValue.done,
+                      child: Text(FilterValue.done.name)),
+                  PopupMenuItem(
+                      value: FilterValue.undone,
+                      child: Text(FilterValue.undone.name))
+                ],
+                onSelected: (FilterValue value) {
+                  context.read<MyState>().setSelectedFilter(value);
+                },
+                //[IconButton(onPressed: () {}, icon: Icon(Icons.more_vert))],
+              ),
+            ]),
         body: ListView(
             children: todos.map((todo) => _item(todo, context)).toList()),
+
         floatingActionButton: IconButton(
           onPressed: () {
             Navigator.push(
@@ -109,9 +149,11 @@ class MyApp extends StatelessWidget {
           icon: Icon(Icons.add_circle),
           iconSize: 50,
         ),
+        
       ),
     );
   }
+
 
   Widget _item(Todo todo, BuildContext context) {
     return Column(
@@ -205,11 +247,12 @@ class _OtherViewState extends State<OtherView> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextButton.icon(
-                onPressed: () {
-                  context
+                onPressed: () async {
+                  await context
                       .read<MyState>()
                       .addTodo(textEditingController!.text, false);
-                  context.read<MyState>().fetchTodos();
+                  Navigator.pop(context);
+                  //context.read<MyState>().fetchTodos();
                 },
                 icon: Icon(Icons.add),
                 label: Text('ADD'),
