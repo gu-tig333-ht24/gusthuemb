@@ -1,24 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'state.dart';
-import 'model.dart';
-import 'screens/todo.dart';
+import '../state.dart';
+import '../model.dart';
+import 'todo.dart';
 
-void main() {
-  MyState state = MyState();
-
-  // hämta listan av todos
-  state.fetchTodos();
-
-  runApp(
-    ChangeNotifierProvider(
-        create: (context) => state,
-        child: MaterialApp(
-          title: 'Todo app',
-          home: MyApp(),
-        )),
-  );
-}
 
 class MyApp extends StatelessWidget {
   MyApp({super.key});
