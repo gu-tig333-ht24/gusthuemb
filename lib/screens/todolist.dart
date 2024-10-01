@@ -5,15 +5,15 @@ import '../model.dart';
 import 'todo.dart';
 
 
-class MyApp extends StatelessWidget {
-  MyApp({super.key});
+class TodoListView extends StatelessWidget {
+  TodoListView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var todos = context.watch<MyState>().todos;
+    var todos = context.watch<TodoState>().todos;
 
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Check It',
       home: Scaffold(
         appBar: AppBar(
             title: Text('TIG333 TODO'),
@@ -32,17 +32,17 @@ class MyApp extends StatelessWidget {
                       child: Text(FilterValue.undone.name))
                 ],
                 onSelected: (FilterValue value) {
-                  context.read<MyState>().setSelectedFilter(value);
+                  context.read<TodoState>().setSelectedFilter(value);
                 },
                 //[IconButton(onPressed: () {}, icon: Icon(Icons.more_vert))],
               ),
             ]),
         body: ListView(
-            children: todos.map((todo) => _item(todo, context)).toList()),
+            children: todos.map((todo) => _listItem(todo, context)).toList()),
         floatingActionButton: IconButton(
           onPressed: () {
             Navigator.push(
-                context, MaterialPageRoute(builder: (context) => OtherView()));
+                context, MaterialPageRoute(builder: (context) => TodoView()));
           },
           icon: Icon(Icons.add_circle),
           iconSize: 50,
@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  Widget _item(Todo todo, BuildContext context) {
+  Widget _listItem(Task todo, BuildContext context) {
     return Column(
       children: [
         Padding(padding: EdgeInsets.all(10)),
@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
             children: [
               IconButton(
                   onPressed: () {
-                    context.read<MyState>().checkTask(todo);
+                    context.read<TodoState>().checkTask(todo);
                   },
                   icon: Icon(todo.ischecked
                       ? Icons.check_box_outlined
@@ -84,7 +84,7 @@ class MyApp extends StatelessWidget {
               ),
               IconButton(
                   onPressed: () {
-                    context.read<MyState>().removeTask(todo);
+                    context.read<TodoState>().removeTask(todo);
                   },
                   icon: Icon(Icons.clear_outlined)),
             ]),

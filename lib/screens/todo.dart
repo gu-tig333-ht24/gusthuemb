@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../state.dart';
 
-
-class OtherView extends StatefulWidget {
+class TodoView extends StatefulWidget {
   @override
-  State<OtherView> createState() => _OtherViewState();
+  State<TodoView> createState() => _TodoViewState();
 }
 
-class _OtherViewState extends State<OtherView> {
+class _TodoViewState extends State<TodoView> {
   TextEditingController? textEditingController;
 
-  _OtherViewState() {
+  _TodoViewState() {
     textEditingController = TextEditingController();
   }
 
@@ -51,7 +50,7 @@ class _OtherViewState extends State<OtherView> {
               TextButton.icon(
                 onPressed: () async {
                   await context
-                      .read<MyState>()
+                      .read<TodoState>()
                       .addTodo(textEditingController!.text, false);
                   Navigator.pop(context);
                 },

@@ -8,24 +8,24 @@ enum FilterValue { all, done, undone }
 String ENDPOINT = 'https://todoapp-api.apps.k8s.gu.se';
 String KEY = '74242629-8342-4db7-b446-5f9163e6541b';
 
-class MyState extends ChangeNotifier {
-  List<Todo> _todos = [];
+class TodoState extends ChangeNotifier {
+  List<Task> _todos = [];
 
-  List<Todo> get todos => _todos;
+  List<Task> get todos => _todos;
 
   FilterValue _selectedFilter = FilterValue.all;
 
   FilterValue get selectedFilter => _selectedFilter;
 
   Future<void> addTodo(String title, bool checked) async {
-    Todo todo = (Todo(title, checked));
+    Task todo = (Task(title, checked));
     await http.post(Uri.parse('$ENDPOINT/todos?key=$KEY'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(todo.toJson()));
     fetchTodos();
   }
 
-  void checkTask(Todo todo) async {
+  void checkTask(Task todo) async {
     await http.put(Uri.parse('$ENDPOINT/todos/${todo.id}?key=$KEY'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(
@@ -33,18 +33,18 @@ class MyState extends ChangeNotifier {
     fetchTodos();
   }
 
-  void removeTask(Todo todo) async {
+  void removeTask(Task todo) async {
     await http.delete(Uri.parse('$ENDPOINT/todos/${todo.id}?key=$KEY'));
     fetchTodos();
   }
 
   //hämta alla todos från backend api
-  Future<List<Todo>> getTodos() async {
+  Future<List<Task>> getTodos() async {
     http.Response response =
         await http.get(Uri.parse('$ENDPOINT/todos?key=$KEY'));
     String body = response.body;
     final List<dynamic> todoList = jsonDecode(body);
-    return todoList.map((json) => Todo.fromJson(json)).toList();
+    return todoList.map((json) => Task.fromJson(json)).toList();
   }
 
   void fetchTodos() async {
