@@ -25,8 +25,6 @@ class TodoListView extends StatelessWidget {
             actions: [_filterMenu(context)]),
         body: Column(
           children: [
-            Padding(padding: EdgeInsets.all(10)),
-            _homePageTitle(),
             Expanded(
               child: ListView(
                   children:
@@ -36,18 +34,6 @@ class TodoListView extends StatelessWidget {
         ),
         floatingActionButton: _addTodoButton(context),
       ),
-    );
-  }
-
-  Widget _homePageTitle() {
-    return Row(
-      children: [
-        Padding(padding: EdgeInsets.only(left: 10, right: 10)),
-        Text(
-          'Check List',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-      ],
     );
   }
 
