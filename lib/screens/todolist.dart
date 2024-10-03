@@ -16,7 +16,7 @@ class TodoListView extends StatelessWidget {
       title: 'Check It',
       home: Scaffold(
         appBar: AppBar(
-            title: Text('TIG333 TODO'),
+            title: Text('Check It'),
             backgroundColor: Colors.grey,
             actions: [
               PopupMenuButton(
@@ -34,11 +34,11 @@ class TodoListView extends StatelessWidget {
                 onSelected: (FilterValue value) {
                   context.read<TodoState>().setSelectedFilter(value);
                 },
-                //[IconButton(onPressed: () {}, icon: Icon(Icons.more_vert))],
               ),
             ]),
-        body: ListView(
-            children: todos.map((todo) => _listItem(todo, context)).toList()),
+        body: 
+        ListView(
+            children:todos.map((todo) => _listItem(todo, context)).toList()),
         floatingActionButton: IconButton(
           onPressed: () {
             Navigator.push(
@@ -63,7 +63,7 @@ class TodoListView extends StatelessWidget {
                   onPressed: () {
                     context.read<TodoState>().checkTask(todo);
                   },
-                  icon: Icon(todo.ischecked
+                  icon: Icon(todo.isChecked
                       ? Icons.check_box_outlined
                       : Icons.check_box_outline_blank_outlined)),
               Expanded(
@@ -75,7 +75,7 @@ class TodoListView extends StatelessWidget {
                       todo.task,
                       style: TextStyle(
                           fontSize: 28,
-                          decoration: todo.ischecked
+                          decoration: todo.isChecked
                               ? TextDecoration.lineThrough
                               : TextDecoration.none),
                     ),

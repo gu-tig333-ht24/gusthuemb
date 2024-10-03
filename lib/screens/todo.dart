@@ -24,7 +24,7 @@ class _TodoViewState extends State<TodoView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('TIG333 TODO'),
+        title: Text('Check It'),
         backgroundColor: Colors.grey,
       ),
       body: Column(

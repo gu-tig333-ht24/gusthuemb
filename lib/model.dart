@@ -1,9 +1,9 @@
 class Task {
   String? id;
   String task;
-  bool ischecked;
+  bool isChecked;
 
-  Task(this.task, this.ischecked, [this.id]);
+  Task(this.task, this.isChecked, [this.id]);
 
   factory Task.fromJson(Map<String, dynamic> json) {
     return Task(json['title'], json['done'], json['id']);
@@ -11,7 +11,7 @@ class Task {
   Map<String, dynamic> toJson() {
     return {
       "title": task,
-      "done": ischecked,
+      "done": isChecked,
     };
   }
 }

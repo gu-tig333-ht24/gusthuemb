@@ -6,15 +6,15 @@ import 'screens/todolist.dart';
 void main() {
   TodoState state = TodoState();
 
-  // hämta listan av todos
   state.fetchTodos();
 
   runApp(
     ChangeNotifierProvider(
-        create: (context) => state,
-        child: MaterialApp(
-          title: 'Check It',
-          home: TodoListView(),
-        )),
+      create: (context) => state,
+      child: MaterialApp(
+        title: 'Check It',
+        home: TodoListView(),
+      ),
+    ),
   );
 }
