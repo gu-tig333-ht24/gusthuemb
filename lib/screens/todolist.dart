@@ -4,6 +4,7 @@ import '../state.dart';
 import '../model.dart';
 import 'todo.dart';
 
+/// [TodoListView] renders a list of [Task] objects, created in [TodoView].
 class TodoListView extends StatelessWidget {
   TodoListView({super.key});
 
@@ -37,6 +38,7 @@ class TodoListView extends StatelessWidget {
     );
   }
 
+/// With [_filterMenu], list of [Task] objects can be sorted on [FilterValue] all, done and undone.
   Widget _filterMenu(BuildContext context) {
     return PopupMenuButton(
       color: const Color.fromARGB(255, 249, 249, 249),
@@ -104,6 +106,7 @@ class TodoListView extends StatelessWidget {
     );
   }
 }
+
 
 Widget _addTodoButton(BuildContext context) {
   return IconButton(

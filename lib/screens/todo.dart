@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../state.dart';
 
+/// [TodoView] renders an input field [_inputField] to be able to add a single task.
 class TodoView extends StatefulWidget {
   @override
   State<TodoView> createState() => _TodoViewState();

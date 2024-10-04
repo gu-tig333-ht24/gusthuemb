@@ -5,6 +5,8 @@ import 'model.dart';
 
 enum FilterValue { all, done, undone }
 
+///[TodoState] holds the state of tasks and selected filter. 
+///Any change to the state are reflected in the views.
 class TodoState extends ChangeNotifier {
 
   final String _key = '74242629-8342-4db7-b446-5f9163e6541b';

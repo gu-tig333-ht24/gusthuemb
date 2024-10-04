@@ -1,6 +1,6 @@
-# template
+# Check It application
 
-A new Flutter project.
+Check It application is built on flutter and is a demo project in the course TIG333.
 
 ## Getting Started
 
